@@ -21,11 +21,10 @@ def waterstones_scraper
 
   # write urls to csv
   output_csv(urls, 'url')
-
 end
 
 def output_csv(array, name)
-  CSV.open("output/#{name}_#{Time.now.strftime('%Y%m%d_%H%M%S')}.csv", 'wb') do |row|
+  CSV.open("book_files/#{name}_#{Time.now.strftime('%Y%m%d_%H%M%S')}.csv", 'wb') do |row|
     array.each do |element|
       row << [element]
     end
