@@ -1,6 +1,5 @@
 require 'csv'
 require 'open-uri'
-require_relative 'waterstones_isbn_scraper/waterstones_isbn_scraper'
 
 # Find book on amazon from file of isbns, then retrieve price and availability information
 # Optional functionality - could scrape ISBNs from another site to feed to this module
