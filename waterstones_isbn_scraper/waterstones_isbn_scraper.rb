@@ -4,29 +4,48 @@ require 'csv'
 
 BESTSELLERS = 'https://www.waterstones.com/books/bestsellers'.freeze
 
-def waterstones_scraper
-  # get html from bestsellers page
-  html_content = Nokogiri::HTML(URI.parse(BESTSELLERS).open)
-  html_content = html_content.search('.title-wrap a')
+# Handle scraping bestsellers pages of www.waterstones.com. Creates output files.
+class WaterstonesIsbnScraper
+  def initialize
+    @doc = nil
+    @isbns = nil
+    @urls = nil
+  end
 
-  # get array of urls from bestsellers page
-  urls = html_content.map { |url| "https://www.waterstones.com#{url.attributes['href'].value}"}
+  def run
+    # get html from bestsellers page
+    html = Nokogiri::HTML(URI.parse(BESTSELLERS).open)
+    @doc = html.search('.title-wrap a')
 
-  # with array of urls, strip last 13 digits for isbn13s
-  isbns = urls.map { |isbn| isbn.chars.last(13).join }
-  p isbns
+    # get array of urls from bestsellers page
+    @urls = url_mapping(@doc)
 
-  # write isbns to csv
-  output_csv(isbns, 'isbn')
+    # with array of urls, strip last 13 digits for isbn13s
+    @isbns = isbn_mapping(@urls)
 
-  # write urls to csv
-  output_csv(urls, 'url')
-end
+    # write isbns to csv
+    output_csv(@isbns, 'isbn')
 
-def output_csv(array, name)
-  CSV.open("book_files/#{name}_#{Time.now.strftime('%Y%m%d_%H%M%S')}.csv", 'wb') do |row|
-    array.each do |element|
-      row << [element]
+    # write urls to csv
+    output_csv(@urls, 'url')
+  end
+
+  def url_mapping(doc)
+    # strip urls from doc
+    doc.map { |url| "https://www.waterstones.com#{url.attributes['href'].value}" }
+  end
+
+  def isbn_mapping(urls)
+    # strip isbns from urls
+    urls.map { |isbn| isbn.chars.last(13).join }
+  end
+
+  def output_csv(array, name)
+    # for outputting urls and isbns to .csv
+    CSV.open("book_files/#{name}_#{Time.now.strftime('%Y%m%d_%H%M%S')}.csv", 'wb') do |row|
+      array.each do |element|
+        row << [element]
+      end
     end
   end
 end
