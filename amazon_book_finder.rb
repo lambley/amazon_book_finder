@@ -4,6 +4,7 @@ require 'open-uri'
 # Find book on amazon from file of isbns, then retrieve price and availability information
 # Optional functionality - could scrape ISBNs from another site to feed to this module
 class AmazonBookFinder
+  attr_reader :isbns
 
   def initialize
     @input = nil # => filename string
@@ -27,8 +28,8 @@ class AmazonBookFinder
       if isbn.size == 13
         isbn13 = isbn[3..11]
         sum = 0
-        (0..8).each { |index| sum += isbn[index].chr.to_i * (10 - index) }
-        check = (11 - sum) % 11 == 10 ? "X" : ((11 - sum) % 11).to_s
+        (0..8).each { |index| sum += isbn13[index].chr.to_i * (10 - index) }
+        check = (11 - sum) % 11 == 10 ? 'X' : ((11 - sum) % 11).to_s
         "#{isbn13}#{check}"
       else
         isbn
